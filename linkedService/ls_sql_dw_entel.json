@@ -1,0 +1,17 @@
+{
+	"name": "ls_sql_dw_entel",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"server": "sql-ucb-sisinfo-entel-delta9507434.database.windows.net",
+			"database": "dw_entel_delta",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SQL",
+			"userName": "Alejandro",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQENBRjk3OTMyLUZFNTctNDlENi04NTY4LTZGNTU4QTYwMTFFQV9jNzBkMjRlZC1lZDJmLTQ1NjctOGM2MC1iNjE5MmYxODU2NjAiDQp9"
+		}
+	}
+}
