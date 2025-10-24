@@ -22,7 +22,15 @@
 					"name": "a06"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_sql_silver_datos",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "union1"
@@ -32,6 +40,12 @@
 				},
 				{
 					"name": "cast1"
+				},
+				{
+					"name": "cast2"
+				},
+				{
+					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
@@ -77,7 +91,50 @@
 				"          descargados as integer,",
 				"          total as integer",
 				"     ),",
-				"     errors: true) ~> cast1"
+				"     errors: true) ~> cast1",
+				"derivedColumn2 cast(output(",
+				"          Latitud as decimal(10,7),",
+				"          Longitud as decimal(10,7)",
+				"     ),",
+				"     errors: true) ~> cast2",
+				"cast1 derive(Latitud = replace(Latitud, ',', '.'),",
+				"          Longitud = replace(Longitud, ',', '.')) ~> derivedColumn2",
+				"cast2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          fecha_inicio as timestamp,",
+				"          fecha_fin as timestamp,",
+				"          numero as string,",
+				"          imei as string,",
+				"          rbs_utilizada as string,",
+				"          celda as string,",
+				"          latitud as decimal(10,7),",
+				"          longitud as decimal(10,7),",
+				"          subidos as integer,",
+				"          descargados as integer,",
+				"          total as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          fecha_inicio,",
+				"          fecha_fin,",
+				"          numero,",
+				"          imei,",
+				"          rbs_utilizada,",
+				"          celda,",
+				"          latitud = Latitud,",
+				"          longitud = Longitud,",
+				"          subidos,",
+				"          descargados,",
+				"          total",
+				"     )) ~> sink1"
 			]
 		}
 	}
