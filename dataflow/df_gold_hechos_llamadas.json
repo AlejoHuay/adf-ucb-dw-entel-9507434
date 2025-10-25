@@ -83,6 +83,9 @@
 				},
 				{
 					"name": "select2"
+				},
+				{
+					"name": "select3"
 				}
 			],
 			"scriptLines": [
@@ -170,7 +173,7 @@
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup4",
 				"select2, dimNumero lookup(numero_a == numero",
-				"     && numero_b == numero,",
+				"     && ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup5",
@@ -218,7 +221,17 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select2",
-				"lookup5 sink(allowSchemaDrift: true,",
+				"lookup5 select(mapColumn(",
+				"          duracion,",
+				"          id_servicio,",
+				"          id_registro,",
+				"          id_fecha,",
+				"          id_radiobase,",
+				"          id_numero",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"select3 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          id_llamada as integer,",
