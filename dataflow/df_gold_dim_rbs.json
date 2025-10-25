@@ -29,7 +29,15 @@
 					"name": "rbsB"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_gold_dim_rbs",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "union1"
@@ -38,7 +46,10 @@
 					"name": "union2"
 				},
 				{
-					"name": "derivedColumn1"
+					"name": "filter1"
+				},
+				{
+					"name": "aggregate1"
 				}
 			],
 			"scriptLines": [
@@ -68,7 +79,29 @@
 				"     format: 'query') ~> rbsB",
 				"RadioBaseDatos, rbsA union(byName: true)~> union1",
 				"union1, rbsB union(byName: true)~> union2",
-				"union2 derive(rbs_utilizada = !isNull(rbs_utilizada)) ~> derivedColumn1"
+				"union2 filter(!isNull(rbs_utilizada)) ~> filter1",
+				"filter1 aggregate(groupBy(rbs_utilizada),",
+				"     each(match(name != 'rbs_utilizada'), $$ = first($$))) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id_radiobase as integer,",
+				"          radiobase as string,",
+				"          celda as string,",
+				"          latitud as decimal(10,7),",
+				"          longitud as decimal(10,7)",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          radiobase = rbs_utilizada",
+				"     )) ~> sink1"
 			]
 		}
 	}
