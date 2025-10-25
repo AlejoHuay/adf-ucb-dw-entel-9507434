@@ -1,0 +1,75 @@
+{
+	"name": "df_gold_dim_rbs",
+	"properties": {
+		"folder": {
+			"name": "Gold"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_sql_silver_datos",
+						"type": "DatasetReference"
+					},
+					"name": "RadioBaseDatos"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sql_silver_llamadas",
+						"type": "DatasetReference"
+					},
+					"name": "rbsA"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sql_silver_llamadas",
+						"type": "DatasetReference"
+					},
+					"name": "rbsB"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "union1"
+				},
+				{
+					"name": "union2"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          rbs_utilizada as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select DISTINCT rbs_utilizada from silver.datos',",
+				"     format: 'query') ~> RadioBaseDatos",
+				"source(output(",
+				"          rbs_utilizada as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select DISTINCT rbs_utilizada_a as rbs_utilizada from silver.llamadas',",
+				"     format: 'query') ~> rbsA",
+				"source(output(",
+				"          rbs_utilizada as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select DISTINCT rbs_utilizada_b as rbs_utilizada from silver.llamadas',",
+				"     format: 'query') ~> rbsB",
+				"RadioBaseDatos, rbsA union(byName: true)~> union1",
+				"union1, rbsB union(byName: true)~> union2",
+				"union2 derive(rbs_utilizada = !isNull(rbs_utilizada)) ~> derivedColumn1"
+			]
+		}
+	}
+}
